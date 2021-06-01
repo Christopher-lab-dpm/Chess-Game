@@ -3,11 +3,11 @@ import pygame
 from Piece import Piece
 #from BoardSettings import BoardSetting
 
-class Queen(Piece):
+class Rook(Piece):
     #Location is a tuple (x,y) and the board is a 2D array
    def __init__(self, screen, color,name, location, board):
        
-       super(Queen, self).__init__(screen, color, name, location, board)
+       super(Rook, self).__init__(screen, color, name, location, board)
        self.image_file = "C:/Users/Christopher/Documents/Chess pieces"+"/"+name+".bmp"
        self.image = pygame.image.load(self.image_file)
    
@@ -18,17 +18,8 @@ class Queen(Piece):
         
         legal_row = self.check_row()
         legal_file = self.check_file()
-        legal_diag = self.check_diagonals()
-        
-        legal_moves =  legal_row + legal_file + legal_diag
-        
+             
+        legal_moves =  legal_row + legal_file 
         return legal_moves
-            
-            
-            
-            
-            
-            
-            
             
             

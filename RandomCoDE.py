@@ -41,17 +41,13 @@ class BoardSetup():
                      pygame.quit() 
                      sys.exit()
                  elif pygame.mouse.get_pressed()[0]:#Check is the mouse button was pressed down
-                     if board.is_moving_piece():
-                         print("Moving piece!")
-                         mouse_pos = pygame.mouse.get_pos() 
-                         piecesetup.move_select_piece(mouse_pos,board)
-                         FEN = piecesetup.create_new_FEN(board)
-                         print(FEN)
-                     else:
-                         # Piece was not selected to move  
+                     
                          print("Selected!")
                          mouse_pos = pygame.mouse.get_pos() 
-                         piecesetup.select_piece(mouse_pos,board)
+                         print (str(mouse_pos))
+                         board_coord = PositionPlacement.mouse_to_board(mouse_pos[0], 
+                                                        mouse_pos[1])
+                         print (str(board_coord))
                          
                  else:
                      pass
@@ -61,9 +57,7 @@ class BoardSetup():
             
             board.make_tiles()
             
-            # Add the piece onto the board
-            piecesetup.blitme(FEN,board)
-                     
+      
           
             # Make the most recently drawn screen visible.
             pygame.display.flip()
