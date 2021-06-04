@@ -60,24 +60,44 @@ class PieceSetup():
                 pass
             elif board.get_turn() == maybe_piece.color:
                 board.change_moving_piece(maybe_piece)
-                pass
+                legal_moves = board.moving_piece.check_legal_moves()
             else: #The piece was the wrong color
+                print("wrong color")
                 pass
     
     def move_select_piece(self, mouse_position, board):
+         """return false indicating that a new FEN must be loaded because internal board was altered
+         Note that this was of doing it loses certain information such as en passant 
+         priveleges"""
+         legal_moves = board.moving_piece.check_legal_moves()
          board_coord = PositionPlacement.mouse_to_board(mouse_position[0], mouse_position[1])
+         print (str(board_coord))
          if board_coord[1] < 0 or board_coord[1] > 7 or board_coord[0] < 0 or board_coord[0] > 7:
            #Cursor was not in the board
-           pass
+           return True #The move did not alter the board, no need to return false
+           
          else:
            selected_tile = board.access_tile(board_coord[0], board_coord[1])
-           #Check if there is a piece at that location
-           if  selected_tile != 0 and board.get_turn() == selected_tile.color:
+           #Check if there is a piece at that location and opposite color or 
+           #if it a possible move
+           if  (selected_tile != 0 and board.get_turn() == selected_tile.color 
+                or board_coord not in legal_moves):
                print("That is an illegal move")
                board.change_moving_piece(None)
-               pass
+               return True #The move did not alter the board, no need to return false
            else: #The piece is of opposite color or empty square
-               board.change_piece_location(board_coord)
+           
+           #Boolean legal_move helpls determine if the move did or didnt violate some other rules
+           #Example exposing the king to check
+           #If it did then we return false indicating that a new FEN must be loaded
+               legal_move = board.change_piece_location(board_coord)
+               if legal_move:
+                   board.update_turn()
+                   return True
+               else:
+                   checkmated = board.determine_checkmate()
+                   print(checkmated)
+                   return not(checkmated)
               
                
     def create_piece_add_to_board(self, current_piece_name, place, board):
@@ -90,6 +110,7 @@ class PieceSetup():
         if current_piece_name == self.set_of_pieces[0]:
             king = King(self.screen, "Black", "BlackKing", (place[1],place[2]), board)
             populate_tile = king
+            board.black_king = king
         elif current_piece_name == self.set_of_pieces[1]:
             queen = Queen(self.screen, "Black", "BlackQueen", (place[1],place[2]), board)
             populate_tile = queen
@@ -101,7 +122,10 @@ class PieceSetup():
             populate_tile = knight
         elif current_piece_name == self.set_of_pieces[4]:
             pawn = Pawn(self.screen, "Black", "BlackPawn", (place[1],place[2]), board)
-            populate_tile = pawn
+            pawn_position = pawn.get_position()
+            if pawn_position[0] != 1:
+                pawn.set_starting(False)
+            populate_tile = pawn    
         elif current_piece_name == self.set_of_pieces[5]:
             rook = Rook(self.screen, "Black", "BlackRook", (place[1],place[2]), board)
             populate_tile = rook
@@ -110,6 +134,7 @@ class PieceSetup():
         elif current_piece_name == self.set_of_pieces[6]:
             king = King(self.screen, "White", "WhiteKing", (place[1],place[2]), board)
             populate_tile = king
+            board.white_king = king
         elif current_piece_name == self.set_of_pieces[7]:
             queen = Queen(self.screen, "White", "WhiteQueen", (place[1],place[2]), board)
             populate_tile = queen
@@ -121,7 +146,10 @@ class PieceSetup():
             populate_tile = knight
         elif current_piece_name == self.set_of_pieces[10]:
             pawn = Pawn(self.screen, "White", "WhitePawn", (place[1],place[2]), board)
-            populate_tile = pawn
+            pawn_position = pawn.get_position()
+            if pawn_position[0] != 6:
+                pawn.set_starting(False)
+            populate_tile = pawn  
         elif current_piece_name == self.set_of_pieces[11]:
             rook = Rook(self.screen, "White", "WhiteRook", (place[1],place[2]), board)
             populate_tile = rook

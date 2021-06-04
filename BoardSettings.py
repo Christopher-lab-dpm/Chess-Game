@@ -12,3 +12,8 @@ class BoardSetting():
         
         self.tile_width = 60
         self.tile_height = 60
+        self.radius_coefficient = 3
+    
+        self.move_color = (238, 123, 123)
+        
+        

@@ -1,5 +1,6 @@
 import pygame
 
+
 from Piece import Piece
 #from BoardSettings import BoardSetting
 
@@ -17,18 +18,14 @@ class Queen(Piece):
         of the legal moves a given piece has"""
         
         legal_row = self.check_row()
+               
         legal_file = self.check_file()
+               
         legal_diag = self.check_diagonals()
-        
+                
         legal_moves =  legal_row + legal_file + legal_diag
         
+        self.legal_moves = legal_moves
+                
         return legal_moves
-            
-            
-            
-            
-            
-            
-            
-            
-            
+ 

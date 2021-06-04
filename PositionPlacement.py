@@ -16,7 +16,7 @@ def matrix_to_screen_name(name,x,y):
     screen_coordinate = (name,x,y)
     return screen_coordinate
 
-def matrix_to_screen(x,y):
+def matrix_to_screen(y,x):
     """x and y are integers from 0 to 7. Where the chess board is a matrix and
     (0,0) is the a8 square if perspective is white (which is the assumed one)"""
     

@@ -13,8 +13,34 @@ class Knight(Piece):
    
     
    def check_legal_moves(self):
-        """Method overriden in the different piece subclasses which will return a list
-        of the legal moves a given piece has"""
+         """Method overriden in the different piece subclasses which will return a list
+         of the legal moves a given piece has"""
+         legal_moves = []
 
-            
-            
+         legal_moves.append((self.board_coord[0] - 2,self.board_coord[1] + 1))
+         legal_moves.append((self.board_coord[0] - 2,self.board_coord[1] - 1))
+         legal_moves.append((self.board_coord[0] + 2,self.board_coord[1] + 1))
+         legal_moves.append((self.board_coord[0] + 2,self.board_coord[1] - 1))
+         legal_moves.append((self.board_coord[0] + 1,self.board_coord[1] - 2))
+         legal_moves.append((self.board_coord[0] + 1,self.board_coord[1] + 2))
+         legal_moves.append((self.board_coord[0] - 1,self.board_coord[1] + 2))
+         legal_moves.append((self.board_coord[0] - 1,self.board_coord[1] - 2))
+         
+         i = 0 
+         while True:
+             if i == len(legal_moves) :
+                 break
+             move = legal_moves[i]
+             if (move[1] < 0 or move[1] > 7 
+             or move[0] < 0 or move[0] > 7):
+                 legal_moves.remove(move)
+             elif (self.board.access_tile(move[0], move[1]) !=0
+                   and self.board.access_tile(move[0], move[1]).color == self.color):
+                 legal_moves.remove(move)
+             else:
+                i += 1
+         
+         self.legal_moves = legal_moves
+         return legal_moves
+         
+         

@@ -17,9 +17,12 @@ class Rook(Piece):
         of the legal moves a given piece has"""
         
         legal_row = self.check_row()
+               
         legal_file = self.check_file()
-             
+                           
         legal_moves =  legal_row + legal_file 
+        
+        self.legal_moves = legal_moves
         return legal_moves
             
             

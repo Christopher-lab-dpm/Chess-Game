@@ -15,9 +15,10 @@ class Bishop(Piece):
    def check_legal_moves(self):
         """Method overriden in the different piece subclasses which will return a list
         of the legal moves a given piece has"""
-
+                      
         legal_diag = self.check_diagonals()
-              
+        
+        self.legal_moves = legal_diag      
         return legal_diag
             
             
