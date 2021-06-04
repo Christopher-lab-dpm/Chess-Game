@@ -1,0 +1,72 @@
+import sys
+import pygame
+
+from BoardSettings import BoardSetting
+from Display  import Display
+from Board import Board
+import GameLogic
+
+"""A class for setting up the visuals of the application"""
+
+class BoardSetup():
+    """Functions used for the creation of the chess board"""
+    
+    def __init__(self):
+        
+        self.setting = BoardSetting()
+        self.screen = pygame.display.set_mode((self.setting.screen_width,
+                                               self.setting.screen_height))
+           
+   
+    
+    def run_board_setup(self):
+         # Initialize game and create a screen object.
+         pygame.init()
+         # Give title to opned window
+         pygame.display.set_caption("Chess Board")
+         
+         FEN = "k7/r6P/8/8/8/Q7/8/K7"
+         # Add a piece 
+         display  = Display(self.screen)
+         # Create board instance
+         #board = [[0]*8 for _ in range(8)] #This creates 2D array where each array is seperate
+         
+         board = Board(self.screen)
+         board.intialize_board_position(FEN)  
+         
+         
+         # Start the main loop for the game.
+         while True:
+         # Watch for keyboard and mouse events.
+            for event in pygame.event.get():
+                 if event.type == pygame.QUIT:
+                     pygame.quit() 
+                     sys.exit()
+                 elif pygame.mouse.get_pressed()[0]:#Check is the mouse button was pressed down    
+                     if  not(board.is_moving_piece()):#No piece selected yet
+                         mouse_pos = pygame.mouse.get_pos() 
+                         GameLogic.select_piece(mouse_pos,board)
+                         
+                     elif board.is_moving_piece():
+                         mouse_pos = pygame.mouse.get_pos()
+                         moved = GameLogic.move_piece(mouse_pos,board)
+                         if moved:
+                             GameLogic.update_turn(board)
+                             GameLogic.determine_checkmate(board)
+                         else:
+                             pass
+                 else:
+                     pass
+            #Update the screen
+            display.update_board_visuals(board)        
+            # Make the most recently drawn screen visible.
+            pygame.display.flip()
+            
+          
+g = BoardSetup()
+g.run_board_setup()
+
+
+         
+            
+                 
