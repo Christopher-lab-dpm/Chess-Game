@@ -19,6 +19,8 @@ class Bishop(Piece):
         legal_diag = self.check_diagonals(board)
         
         
-        return legal_diag
+        legal_moves = self.check_allowed_moved(board,legal_diag)
+        
+        return legal_moves
             
             

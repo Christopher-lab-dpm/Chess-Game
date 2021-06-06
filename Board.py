@@ -62,7 +62,7 @@ class Board():
     
     def change_piece_location(self,new_location):#New location (y,x) aka (i,j)
         old_location =  self.moving_piece.get_position() # Of piece that just moved    
-        
+        self.location_capture = None
         en_passant_capture = False
         pawn_promoted = False
         
@@ -286,7 +286,8 @@ class Board():
                 self.access_tile(*old_location).update_position(*old_location)
                 self.set_tile(*new_location, 0)
                 
-            elif self.location_capture != None and not(en_passant_capture): 
+            elif self.location_capture != None and not(en_passant_capture):
+                print("IT WRONG HERE")
                 #it was a normal capture
                 self.set_tile(old_location[0], old_location[1], 
                               self.access_tile(*new_location))

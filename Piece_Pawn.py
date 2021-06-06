@@ -39,8 +39,10 @@ class Pawn(Piece):
             self.set_starting(False)
         elif self.get_color() == "Black" and y != 1:
             self.set_starting(False)
-        else:
-            pass
+        elif self.get_color() == "White" and y == 6:
+            self.set_starting(True)
+        elif self.get_color() == "Black" and y == 1:
+            self.set_starting(True)
         
         
                
@@ -130,5 +132,6 @@ class Pawn(Piece):
                     board.access_tile(y +1,x - 1).get_color() != self.get_color()):
                         legal_moves.append((y +1,x - 1))    
         
+        legal_moves = self.check_allowed_moved(board,legal_moves)
          
         return legal_moves  

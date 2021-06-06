@@ -40,6 +40,7 @@ class Knight(Piece):
              else:
                 i += 1
          
+         legal_moves = self.check_allowed_moved(board,legal_moves)   
          
          return legal_moves
          

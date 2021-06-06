@@ -25,6 +25,7 @@ class Queen(Piece):
                 
         legal_moves =  legal_row + legal_file + legal_diag
         
-                      
+        legal_moves = self.check_allowed_moved(board,legal_moves) 
+             
         return legal_moves
  

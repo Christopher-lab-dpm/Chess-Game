@@ -1,7 +1,7 @@
 import pygame
 from BoardSettings import BoardSetting
 import PositionPlacement
-
+import Piece_Safety
 
 boardsettings = BoardSetting()
 
@@ -170,18 +170,60 @@ class Piece():
     
         
     def check_legal_moves(self):
-        """Method overriden in the different piece subclasses 
-        which will return a list of the legal moves a given piece has"""
-        legal_moves = []  
-        for i in range(0,8):
-              for j in range(0,8):
-                  legal_moves.append((i,j))
+         pass
+    
+    ##The method which follows failed and so to not fuck the program i just
+    ##made it return the list without any modifications
+     
+    def check_allowed_moved(self,board,list_of_moves):
+      """  placeholder = None
+        allowed_moves = []
+        color = None
+        initial_threat_level = None
+        second_threat_level = None
+        if self.color == "White":
+            king  = board.white_king
+            king_position = king.get_position()
+            color = "White"
+        else:#Black
+             king  = board.black_king
+             king_position = king.get_position()
+             color = "Black"
+    
+        initial_threat_level = Piece_Safety.check_piece_safety(*king_position,
+                                                                   color, board)
+   
+        placeholder = board.access_tile(*self.board_coord)
+        board.set_tile(*self.board_coord, 0)
         
-        return legal_moves
-    
-    
-  
-    
-  
+        second_threat_level = Piece_Safety.check_piece_safety(*king_position,
+                                                                   color, board)
+        if len(second_threat_level) == 0:
+            board.set_tile(*self.board_coord, placeholder)
+            return list_of_moves 
+        if len(second_threat_level) > len(initial_threat_level):
+            #Moving piece exposes king to danger
+            allowed_moves = []
+            board.set_tile(*self.board_coord, placeholder)
+            return allowed_moves
+        else:
+            board.set_tile(*self.board_coord, placeholder)
+            #If piece isnt pinned to the king, then it can either block danger
+            #if there is danger that is, or can move normally
+            for move in list_of_moves:
+               current_piece = board.access_tile(*self.board_coord)
+               placeholder = board.access_tile(*move)
+               board.set_tile(*move, current_piece) 
+               
+               second_threat_level = Piece_Safety.check_piece_safety(*king_position,
+                                                                   color, board)
+               if len(second_threat_level) < len(initial_threat_level):
+                   allowed_moves.append(move)
+                   board.set_tile(*move, placeholder)
+                   board.set_tile(*self.board_coord, current_piece)
+            return allowed_moves
+                   """
+            
+      return list_of_moves 
      
    
