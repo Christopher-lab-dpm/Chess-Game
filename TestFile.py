@@ -5,6 +5,7 @@ from BoardSettings import BoardSetting
 from Display  import Display
 from Board import Board
 import GameLogic
+import Piece_Safety
 
 """A class for setting up the visuals of the application"""
 
@@ -25,7 +26,7 @@ class BoardSetup():
          # Give title to opned window
          pygame.display.set_caption("Chess Board")
          
-         FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+         FEN = "k7/8/8/8/4Q3/8/8/K7"
          # Add a piece 
          display  = Display(self.screen)
          # Create board instance
@@ -40,7 +41,8 @@ class BoardSetup():
                      print("At Position (" + str(i) + "," + str(j) + 
                            ") we have a " + board.access_tile(i, j).name)
          
-            
+         threat = Piece_Safety.check_piece_safety(1, 0, "White", board)  
+         print("The threats to no pieces are: " + str(threat))
          
          pygame.quit() 
          sys.exit()

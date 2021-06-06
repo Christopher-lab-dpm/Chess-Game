@@ -10,6 +10,13 @@ class Rook(Piece):
        super(Rook, self).__init__(screen, color, name, board_coord)
        self.image_file = "C:/Users/Christopher/Documents/Chess pieces"+"/"+name+".bmp"
        self.image = pygame.image.load(self.image_file)
+       self.moved = False
+       
+   def has_moved(self):
+       return self.moved
+   
+   def set_moved(self, boolean):
+       self.moved =  boolean
    
     
    def check_legal_moves(self,board):

@@ -25,7 +25,7 @@ class BoardSetup():
          # Give title to opned window
          pygame.display.set_caption("Chess Board")
          
-         FEN = "k7/r6P/8/8/8/Q7/8/K7"
+         FEN = "rk6/4pppp/8/8/8/8/8/R2QKBNR"
          # Add a piece 
          display  = Display(self.screen)
          # Create board instance
@@ -52,6 +52,7 @@ class BoardSetup():
                          moved = GameLogic.move_piece(mouse_pos,board)
                          if moved:
                              GameLogic.update_turn(board)
+                             GameLogic.determine_stalemate(board)
                              GameLogic.determine_checkmate(board)
                          else:
                              pass

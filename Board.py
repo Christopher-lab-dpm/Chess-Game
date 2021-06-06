@@ -76,6 +76,7 @@ class Board():
         
         pawn_promoted = self.pawn_promotion(old_location, new_location)
         
+        self.castle_king(old_location, new_location)
         
         #update the board and moving piece position/value    
         self.board[old_location[0]][old_location[1]] = 0
@@ -86,6 +87,7 @@ class Board():
         self.check_king_safety()
                 
         if self.Black_in_check and not(self.White_in_check) and self.white_turn:
+            self.reset_en_passant()
             return True
         elif (self.White_in_check and self.white_turn) or (self.Black_in_check 
              and self.black_turn):
@@ -97,9 +99,11 @@ class Board():
             return False
         
         elif self.White_in_check and not(self.Black_in_check) and self.black_turn:
+            self.reset_en_passant()
             return True
 
         else:
+            self.reset_en_passant()
             return True
         
                    
@@ -125,7 +129,43 @@ class Board():
                  
       
             
-          
+    def castle_king(self,old_location, new_location):#IMPORTANT
+        ##Set the moving values for rook and king if need be
+        ##ONlY move the rook, logic for moving king is already done
+        selected_piece = self.access_tile(*old_location)
+        position = selected_piece.get_position()
+        kings = ["BlackKing", "WhiteKing"]
+        rooks =  ["BlackRook", "WhiteRoook"]
+        x_distance = abs(new_location[1] - old_location[1])
+        if (selected_piece.name in kings and x_distance == 2):#King is castling
+            if (new_location[1] - old_location[1]) < 0: #castled long, aka left
+                rook = self.access_tile(old_location[0], 0)#access rook
+                rook.set_moved(True)
+                selected_piece.set_moved(True)
+                self.set_tile(old_location[0], old_location[1] - 1, rook)#move rook
+                self.access_tile(old_location[0], #update rook location
+                                 old_location[1] - 1).update_position(
+                                                    old_location[0], 
+                                                    old_location[1] - 1)
+                self.set_tile(old_location[0], 0, 0)
+            else:#Castled short
+                rook = self.access_tile(old_location[0], 7)#access rook
+                rook.set_moved(True)
+                selected_piece.set_moved(True)
+                self.set_tile(old_location[0], old_location[1] + 1, rook)#move rook
+                self.access_tile(old_location[0], #update rook location
+                                 old_location[1] + 1).update_position(
+                                                    old_location[0], 
+                                                    old_location[1] + 1)
+                self.set_tile(old_location[0], 7, 0)                     
+        
+        elif (selected_piece.name in kings and x_distance != 2):
+            selected_piece.set_moved(True)
+        elif selected_piece.name in rooks:
+            selected_piece.set_moved(True)
+        else:    
+            pass
+        
     
     
     
@@ -165,6 +205,15 @@ class Board():
                 else:
                      pass
     
+    def reset_en_passant(self):
+        pawn = ["BlackPawn", "WhitePawn" ] 
+        for i in range(0,8):
+            for j in range(0,8):
+                if (self.access_tile(i,j) != 0 and 
+                   self.access_tile(i,j).name in pawn and 
+                   self.access_tile(i, j).color == self.get_turn()):
+                       self.access_tile(i, j).set_en_passant_right(False)
+                       self.access_tile(i, j).set_en_passant_left(False)
      
     def allow_piece_capture (self, old_location, new_location):
         if self.access_tile(*new_location) != 0: # Not an empty square

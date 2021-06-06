@@ -8,7 +8,7 @@ Created on Fri Jun  4 10:35:49 2021
 def check_piece_safety(y,x,color,board): 
     #Enter the position of the piece currently
     #check if the piece is in danger there, i.e. can be captured
-    # coolor is the color of the piece we are checking danger for
+    # color is the color of the piece we are checking danger for
                      
         attack_position = []                    
                            
@@ -103,6 +103,7 @@ def check_piece_safety(y,x,color,board):
             i -= 1
             j += 1
         
+        
         # Check the left upward diagonals
         i = y - 1
         j = x - 1
@@ -155,6 +156,7 @@ def check_piece_safety(y,x,color,board):
             
             i += 1
             j += 1
+        
             
         # Check the left downwards diagonals
         i = y + 1
@@ -202,26 +204,29 @@ def check_piece_safety(y,x,color,board):
          elif (board.access_tile(move[0], move[1]) != 0
                and board.access_tile(move[0], move[1]).get_color() != color
                and board.access_tile(move[0], move[1]).name in knight_piece):
+             
              attack_position.append(move)
+             
          else:
             pass
+   
     
-    
-    
+        
         #Check if enemy king is in adjacent, non-diagonal squares
         enemy_king = [(y-1 ,x),
                   (y+1,x),
                   (y,x-1),
                   (y,x+1)]
-    
+        
         for enemy in enemy_king:
+            
          if (enemy[1] < 0 or enemy[1] > 7 
          or enemy[0] < 0 or enemy[0] > 7):
              pass #outside the board
          elif (board.access_tile(enemy[0], enemy[1]) != 0
                and board.access_tile(enemy[0], enemy[1]).get_color() != color
                and board.access_tile(enemy[0], enemy[1]).name in king_piece):
-             attack_position.append(move)
+             attack_position.append(enemy)
          else:
             pass
         
