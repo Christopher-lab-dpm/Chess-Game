@@ -1,53 +1,56 @@
-import pygame
 import sys
-### Test for legal moves                  
-import Board
-from Piece_Queen import Queen
-from Piece_Knight import Knight
+import pygame
+
 from BoardSettings import BoardSetting
-import PositionPlacement
+from Display  import Display
+from Board import Board
+import GameLogic
+import Piece_Safety
 
-#import pdb
-#pdb.set_trace()
+"""A class for setting up the visuals of the application"""
 
-setting = BoardSetting()
-screen = pygame.display.set_mode((setting.screen_width,
-                                              setting.screen_height))
+class BoardSetup():
+    """Functions used for the creation of the chess board"""
+    
+    def __init__(self):
+        
+        self.setting = BoardSetting()
+        self.screen = pygame.display.set_mode((self.setting.screen_width,
+                                               self.setting.screen_height))
+           
+   
+    
+    def run_board_setup(self):
+         # Initialize game and create a screen object.
+         pygame.init()
+         # Give title to opned window
+         pygame.display.set_caption("Chess Board")
+         
+         FEN = "k7/8/8/8/4Q3/8/8/K7"
+         # Add a piece 
+         display  = Display(self.screen)
+         # Create board instance
+         #board = [[0]*8 for _ in range(8)] #This creates 2D array where each array is seperate
+         
+         board = Board(self.screen)
+         board.intialize_board_position(FEN)  
+         
+         for i in range(0,8):
+             for j in range (0,8):
+                if  board.access_tile(i, j) != 0 : 
+                     print("At Position (" + str(i) + "," + str(j) + 
+                           ") we have a " + board.access_tile(i, j).name)
+         
+         threat = Piece_Safety.check_piece_safety(1, 0, "White", board)  
+         print("The threats to no pieces are: " + str(threat))
+         
+         pygame.quit() 
+         sys.exit()
+            
+g = BoardSetup()
+g.run_board_setup()
 
 
-gameboard  = Board.Board(screen)
-
-location1 = PositionPlacement.matrix_to_screen(2, 7)
-location2 = PositionPlacement.matrix_to_screen(1, 0)
-
-#queen  = Queen(screen, "White", "WhiteQueen", location1, gameboard )
-#bqueen  = Queen(screen, "Black", "BlackQueen", location2, gameboard )
-
-knight = Knight(screen, "Black", "BlackKnight", location2, gameboard )
-gameboard.set_tile(1, 0, knight)
-#gameboard.set_tile(2, 7, queen)
-#gameboard.set_tile(2, 4, bqueen)
-
-for i in range(0,8):
-            for j in range(0,8):
-                if gameboard.access_tile(i,j) != 0:
-                    print(gameboard.access_tile(i,j).name + " " + 
-                          str(gameboard.access_tile(i,j).board_coord))
-                    
-                    
-"""                
-for i in range(0,8):
-            for j in range(0,8):
-                if queen.board.access_tile(i,j) != 0:
-                    print(queen.board.access_tile(i,j).name + " " + 
-                          str(queen.board.access_tile(i,j).board_coord))                    
-"""
-legal_moves = []
-
-legal_moves = knight.check_legal_moves()
-
-print("\n")
-print(legal_moves)
-
-pygame.quit() 
-sys.exit()
+         
+            
+                 

@@ -5,14 +5,14 @@ from Piece import Piece
 
 class Knight(Piece):
     #Location is a tuple (x,y) and the board is a 2D array
-   def __init__(self, screen, color,name, location, board):
+   def __init__(self, screen, color, name, board_coord):
        
-       super(Knight, self).__init__(screen, color, name, location, board)
+       super(Knight, self).__init__(screen, color, name, board_coord)
        self.image_file = "C:/Users/Christopher/Documents/Chess pieces"+"/"+name+".bmp"
        self.image = pygame.image.load(self.image_file)
    
     
-   def check_legal_moves(self):
+   def check_legal_moves(self, board):
          """Method overriden in the different piece subclasses which will return a list
          of the legal moves a given piece has"""
          legal_moves = []
@@ -34,13 +34,14 @@ class Knight(Piece):
              if (move[1] < 0 or move[1] > 7 
              or move[0] < 0 or move[0] > 7):
                  legal_moves.remove(move)
-             elif (self.board.access_tile(move[0], move[1]) !=0
-                   and self.board.access_tile(move[0], move[1]).color == self.color):
+             elif (board.access_tile(move[0], move[1]) !=0
+                   and board.access_tile(move[0], move[1]).color == self.color):
                  legal_moves.remove(move)
              else:
                 i += 1
          
-         self.legal_moves = legal_moves
+         legal_moves = self.check_allowed_moved(board,legal_moves)   
+         
          return legal_moves
          
          

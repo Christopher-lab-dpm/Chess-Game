@@ -5,20 +5,22 @@ from Piece import Piece
 
 class Bishop(Piece):
     #Location is a tuple (x,y) and the board is a 2D array
-   def __init__(self, screen, color,name, location, board):
+   def __init__(self, screen, color, name, board_coord):
        
-       super(Bishop, self).__init__(screen, color, name, location, board)
+       super(Bishop, self).__init__(screen, color, name, board_coord)
        self.image_file = "C:/Users/Christopher/Documents/Chess pieces"+"/"+name+".bmp"
        self.image = pygame.image.load(self.image_file)
    
     
-   def check_legal_moves(self):
+   def check_legal_moves(self,board):
         """Method overriden in the different piece subclasses which will return a list
         of the legal moves a given piece has"""
                       
-        legal_diag = self.check_diagonals()
+        legal_diag = self.check_diagonals(board)
         
-        self.legal_moves = legal_diag      
-        return legal_diag
+        
+        legal_moves = self.check_allowed_moved(board,legal_diag)
+        
+        return legal_moves
             
             

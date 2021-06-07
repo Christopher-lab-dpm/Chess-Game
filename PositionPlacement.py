@@ -70,35 +70,6 @@ def mouse_to_board(x,y): #Necessary for dealing with the double array which is e
     board_coord = (boardY,boardX)
     return board_coord              
               
-def convert_FEN(FEN):
-    """Convert FEN string into proper peice placement on the board"""
-    #Lowercase letters describe the black pieces, Uppercase for White. Just like in PGN,
-    #"p" stands for pawn, "r" for rook, "n" for knight, "b" for bishop, "q" for queen, 
-    #and "k" for king.    
-    #Empty squares are denoted by numbers from one to eight, 
-    #depending on how many empty squares are between two pieces.
-    List_pieces_screen_position = []
-    current_matrix_coord = [0,0]
-    List_of_symbols = ['k','q','b','n','p','r','K','Q','R','B','N','P']
-    
-    for char in FEN:
-       
-        if char in List_of_symbols:
-            List_pieces_screen_position.append(
-                                                 matrix_to_screen_name(
-                                                 char,current_matrix_coord[1],
-                                                 current_matrix_coord[0])
-                                                 )
-            current_matrix_coord[1] = current_matrix_coord[1] + 1 
-            
-        elif ord(char) == ord("/"):
-            current_matrix_coord[0] = current_matrix_coord[0] + 1
-            current_matrix_coord[1] = 0
-            
-         
-        else:
-            current_matrix_coord[1] += int(char)
-        
-    return List_pieces_screen_position
+
 
 
