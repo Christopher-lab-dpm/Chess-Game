@@ -25,7 +25,7 @@ class BoardSetup():
          # Give title to opned window
          pygame.display.set_caption("Chess Board")
          
-         FEN = "2k5/2P5/8/8/Q7/2K5/8/8"
+         FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
          # Add a piece 
          display  = Display(self.screen)
          # Create board instance
@@ -40,6 +40,7 @@ class BoardSetup():
          # Watch for keyboard and mouse events.
             for event in pygame.event.get():
                  if event.type == pygame.QUIT:
+                     board.create_new_FEN()
                      pygame.quit() 
                      sys.exit()
                  elif pygame.mouse.get_pressed()[0]:#Check is the mouse button was pressed down    

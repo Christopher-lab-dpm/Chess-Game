@@ -89,8 +89,12 @@ def check_piece_safety(y,x,color,board):
             elif (board.access_tile(i,j).get_color() != color 
                   and i == y-1 and j == x+1 
                   and board.access_tile(i,j).name in diag_pawn_king):
-                    attack_position.append(((i,j)))
-                    break
+                    
+                    if board.access_tile(i,j).name == "WhitePawn":
+                        break
+                    else:
+                        attack_position.append(((i,j)))
+                        break
               
             elif (board.access_tile(i,j).get_color() != color
                  and board.access_tile(i,j).name in diag_piece):
@@ -115,9 +119,12 @@ def check_piece_safety(y,x,color,board):
            elif (board.access_tile(i,j).get_color() != color 
                  and i == y-1 and  j == x-1 
                  and board.access_tile(i,j).name in diag_pawn_king):
-                    attack_position.append(((i,j)))
-                    break
-            
+                    
+                    if board.access_tile(i,j).name == "WhitePawn":
+                        break
+                    else:
+                        attack_position.append(((i,j)))
+                        break
             
            elif (board.access_tile(i,j).get_color() != color
                 and board.access_tile(i,j).name in diag_piece):
@@ -141,8 +148,12 @@ def check_piece_safety(y,x,color,board):
             elif (board.access_tile(i,j).get_color() != color 
                   and i == y+1 and j == x+1 
                   and board.access_tile(i,j).name in diag_pawn_king):
-                    attack_position.append(((i,j)))
-                    break
+                    
+                    if board.access_tile(i,j).name == "BlackPawn":
+                        break
+                    else:
+                        attack_position.append(((i,j)))
+                        break
             
             
             elif board.access_tile(i,j).get_color() != color:
@@ -169,6 +180,10 @@ def check_piece_safety(y,x,color,board):
             elif (board.access_tile(i,j).get_color() != color 
                   and i == y+1 and j == x-1 
                   and board.access_tile(i,j).name in diag_pawn_king):
+                
+                    if board.access_tile(i,j).name == "BlackPawn":
+                        break
+                    else:
                         attack_position.append(((i,j)))
                         break
             

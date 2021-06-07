@@ -135,7 +135,12 @@ class Board():
         selected_piece = self.access_tile(*old_location)
         position = selected_piece.get_position()
         kings = ["BlackKing", "WhiteKing"]
-        rooks =  ["BlackRook", "WhiteRoook"]
+        rooks =  ["BlackRook", "WhiteRook"]
+        if selected_piece.name in rooks:
+            rook = self.access_tile(*old_location)#access rook
+            rook.set_moved(True)
+            return
+        
         x_distance = abs(new_location[1] - old_location[1])
         if (selected_piece.name in kings and x_distance == 2):#King is castling
             if (new_location[1] - old_location[1]) < 0: #castled long, aka left
@@ -280,14 +285,18 @@ class Board():
                                                     
             #Undo the move
         
-            if(self.location_capture == None and not(pawn_promoted)):
+            if(self.location_capture == None and
+               en_passant_capture == False
+               and pawn_promoted == False):#Reset as normal
+                                         
                 self.set_tile(old_location[0], old_location[1], 
                               self.access_tile(*new_location))
                 self.access_tile(*old_location).update_position(*old_location)
                 self.set_tile(*new_location, 0)
                 
-            elif self.location_capture != None and not(en_passant_capture):
-                print("IT WRONG HERE")
+            elif (self.location_capture != None and en_passant_capture == False
+                and pawn_promoted == False):
+               
                 #it was a normal capture
                 self.set_tile(old_location[0], old_location[1], 
                               self.access_tile(*new_location))
@@ -295,7 +304,8 @@ class Board():
                 self.set_tile(*new_location, self.location_capture)
                 self.access_tile(*new_location).update_position(*new_location)
                 
-            elif self.location_capture != None and en_passant_capture:    
+            elif (self.location_capture != None and en_passant_capture == True
+                and pawn_promoted == False):    
                 #You captured en passant
                 self.set_tile(old_location[0], old_location[1], 
                               self.access_tile(*new_location))
@@ -312,6 +322,7 @@ class Board():
                     pawntype = 'BlackPawn'
                 else:
                      pawntype = 'WhitePawn'
+                     
                 self.set_tile(*new_location,0)     
                 self.create_piece_add_to_board(pawntype,old_location[0], 
                                                old_location[1])
@@ -322,7 +333,8 @@ class Board():
                     self.set_tile(*new_location,self.location_capture)
                     self.access_tile(*new_location).update_position(*new_location)
                     
-                    
+            else:
+                pass
                 
     
     
@@ -479,6 +491,36 @@ class Board():
             piece_info = (current_piece_name, place[1], place[2])
             self.create_piece_add_to_board(*piece_info)            
     
+    
+    def create_new_FEN(self):
+        space_count = 0
+        new_FEN=""
+        for i in range(0,8):
+            space_count = 0     
+            for j in range(0,8):
+                current_tile = self.access_tile(i,j)
+                if current_tile != 0:#There is a piece there
+                    if space_count != 0:
+                        new_FEN += (str(space_count) + self.reverse_name_dict[current_tile.name])
+                    else:
+                        new_FEN += self.reverse_name_dict[current_tile.name]
+                    space_count = 0
+                else:
+                    space_count += 1
+                    
+                if j == 7 and i != 7:
+                    if space_count != 0:
+                         new_FEN += str(space_count) + '/'
+                    else: 
+                         new_FEN += '/'
+                         
+                elif j ==7 and i == 7:
+                    if space_count != 0:
+                         new_FEN += str(space_count)
+        print("\n" + "New FEN is: ")
+        print(new_FEN)                 
+        return new_FEN
+        
     
     def reset_board(self):
         for i in range(0,8):

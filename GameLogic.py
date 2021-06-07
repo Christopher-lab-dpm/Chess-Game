@@ -155,24 +155,69 @@ def determine_checkmate(board):
                attack_color = board.access_tile(*attack).get_color()
                def_piece_loc = Piece_Safety.check_piece_safety(*attack,attack_color,board)
                
+               #Check to see if attacking piece may be captured
                for piece_loc in def_piece_loc:
                    
                    if board.access_tile(*piece_loc).name != king_type :
-                       available_moves = board.access_tile(*piece_loc).check_legal_moves(board)
-                       if attack in available_moves:
+                       
                            place_holder = board.access_tile(*piece_loc)
                            board.set_tile(*piece_loc, 0)
                            attack_origin2 = Piece_Safety.check_piece_safety(y,x,color,board)
                            if len(attack_origin2) > len(attack_origin):
-                               #Not a valid move
+                               #Not a valid move, it put the king in danger
                                board.set_tile(*piece_loc, place_holder)
                                continue
                            else:
+                               #But this is only if a peice can attack the piece 
+                               #giving check, it doesn't account for blocking
+                               board.set_tile(*piece_loc, place_holder)
+                                   
                                return False
-                       else:
-                           continue
-                   else:
-                        continue
+                      
+               #By this point, attacking may not be captured
+               #Check for blocks, only bishops, rooks and queens may be blocked
+               for i in range(0,8):
+                   for j in range (0,8):
+                       if (board.access_tile(i,j) != 0
+                           and board.access_tile(i,j).get_color() == color):
+                           def_piece_moves = board.access_tile(i,j).check_legal_moves(board)
+                           
+                           place_holder = board.access_tile(i,j)
+                           board.set_tile(i,j, 0)
+                           attack_origin2 = Piece_Safety.check_piece_safety(y,x,color,board)
+                           if place_holder.name == king_type:
+                               board.set_tile(i,j, place_holder)
+                               continue
+                           elif def_piece_moves == []:
+                               board.set_tile(i,j, place_holder)
+                               continue
+                           elif len(attack_origin2) > len(attack_origin):
+                               #No a valid moves, it put the king in danger
+                               board.set_tile(i,j, place_holder)
+                               continue
+                           else:
+                               board.set_tile(i,j, place_holder)
+                               #Now we know u can make a move
+                               #To block, check the intersection between the 
+                               #List of  moves that can be made by the attacking piece
+                               #The list of moves by the defending piece
+                               #Check king safety again, if no attack pieces, then no check mate
+                               #else checkmate once loop is finished
+                               attacking_moves = board.access_tile(*attack).check_legal_moves(board)
+                               intersection = set(def_piece_moves).intersection(attacking_moves)
+                               #Note the intersection can ony be empty squares
+                               for move in  intersection:
+                                   board.set_tile(*move,  board.access_tile(i,j) )
+                                   attack_origin2 = Piece_Safety.check_piece_safety(y,x,color,board)
+                                   if len(attack_origin2) < len(attack_origin):
+                                       #The attack is successfully blocked!
+                                       board.set_tile(*move, 0)
+                                       return False
+                                   else:
+                                       board.set_tile(*move, 0)
+                                       continue
+               #Attack could not be stopped by taking piece or blocking
+               #Enemy was checkmated    
                print(message)
                set_game_over(board) 
                return True
