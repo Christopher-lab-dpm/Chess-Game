@@ -8,7 +8,7 @@ class Knight(Piece):
    def __init__(self, screen, color, name, board_coord):
        
        super(Knight, self).__init__(screen, color, name, board_coord)
-       self.image_file = "C:/Users/Christopher/Documents/Chess pieces"+"/"+name+".bmp"
+       self.image_file = "Chess pieces"+"/"+name+".bmp"
        self.image = pygame.image.load(self.image_file)
    
     
