@@ -168,15 +168,23 @@ class Piece():
             
         return legal_moves
     
-        
+    
+
+
+    
     def check_legal_moves(self):
          pass
     
-    ##The method which follows failed and so to not fuck the program i just
-    ##made it return the list without any modifications
+    
      
     def check_allowed_moved(self,board,list_of_moves):
-      """  placeholder = None
+        
+        if self.name == "BlackKing" or self.name == "WhiteKing":
+            
+            return list_of_moves
+        
+        
+        placeholder = None
         allowed_moves = []
         color = None
         initial_threat_level = None
@@ -201,29 +209,45 @@ class Piece():
         if len(second_threat_level) == 0:
             board.set_tile(*self.board_coord, placeholder)
             return list_of_moves 
-        if len(second_threat_level) > len(initial_threat_level):
-            #Moving piece exposes king to danger
-            allowed_moves = []
+        elif len(second_threat_level) > 1 : #removing piece from board exposes king to more danger
+                                            #piece has no more moves
+            #Moving piece exposes king to danger when king already in check
+            if self.name != "BlackKing" or self.name != "WhiteKing":
+                allowed_moves = []
+                board.set_tile(*self.board_coord, placeholder)
+                return allowed_moves
+            else:
+                board.set_tile(*self.board_coord, placeholder)
+                return list_of_moves
+        else: #len(second_threat_level) == 1
             board.set_tile(*self.board_coord, placeholder)
-            return allowed_moves
-        else:
-            board.set_tile(*self.board_coord, placeholder)
-            #If piece isnt pinned to the king, then it can either block danger
-            #if there is danger that is, or can move normally
-            for move in list_of_moves:
-               current_piece = board.access_tile(*self.board_coord)
-               placeholder = board.access_tile(*move)
-               board.set_tile(*move, current_piece) 
-               
-               second_threat_level = Piece_Safety.check_piece_safety(*king_position,
-                                                                   color, board)
-               if len(second_threat_level) < len(initial_threat_level):
-                   allowed_moves.append(move)
-                   board.set_tile(*move, placeholder)
-                   board.set_tile(*self.board_coord, current_piece)
-            return allowed_moves
-                   """
+           
+            attacking_moves = board.access_tile(*second_threat_level[0]).check_legal_moves(board)
+                                                
             
-      return list_of_moves 
+            for move in list_of_moves:
+               #Check if attacking piece may be captured
+                             
+               if move in second_threat_level:
+                   allowed_moves.append(move)
+               else: # check if it can block the attacking piece    
+                   if move in attacking_moves:
+                        
+                        board.set_tile(*move, placeholder)
+                        board.set_tile(*self.board_coord, 0)
+                        second_threat_level2 = Piece_Safety.check_piece_safety(*king_position,
+                                                                   color, board)
+                        board.set_tile(*self.board_coord, placeholder)
+                        
+                        
+                        if len(second_threat_level2) == 0:
+                             allowed_moves.append(move)
+                        
+                        board.set_tile(*move, 0)    
+                       
+                         
+                   
+            
+        return allowed_moves 
      
    

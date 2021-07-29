@@ -45,8 +45,9 @@ class Display():
         in the provided list"""
         if  board.is_moving_piece():
             legal_moves = board.get_moving_piece().check_legal_moves(board)
+            allowed_moves = board.get_moving_piece().check_allowed_moves(board, legal_moves)
                       
-            for legal_move in legal_moves:
+            for legal_move in allowed_moves:
                 color = self.setting.move_color
                 center = PositionPlacement.matrix_to_screen(*legal_move)
                 radius = (self.setting.tile_width)/self.setting.radius_coefficient

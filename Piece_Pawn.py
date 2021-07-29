@@ -132,6 +132,9 @@ class Pawn(Piece):
                     board.access_tile(y +1,x - 1).get_color() != self.get_color()):
                         legal_moves.append((y +1,x - 1))    
         
-        legal_moves = self.check_allowed_moved(board,legal_moves)
+       
          
         return legal_moves  
+    
+   def check_allowed_moves(self,board, legal_moves):
+        return super().check_allowed_moved(board, legal_moves)

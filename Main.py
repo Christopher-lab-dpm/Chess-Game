@@ -25,7 +25,9 @@ class BoardSetup():
          # Give title to opned window
          pygame.display.set_caption("Chess Board")
          
-         FEN = "r1b1k1nr/p2p1pNp/n2B4/1p1NP2P/6P1/3P1Q2/P1P1K3/q5b1"
+         #FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq"
+         #FEN = "rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR b qkQK"  
+         FEN = "rnbqkb1r/ppp1pppp/5n2/3P4/8/8/PPPPQPPP/RNB1KBNR b qkQK"
          # Add a piece 
          display  = Display(self.screen)
          # Create board instance
@@ -34,7 +36,7 @@ class BoardSetup():
          board = Board(self.screen)
          board.intialize_board_position(FEN)  
          
-         
+        
          # Start the main loop for the game.
          while True:
          # Watch for keyboard and mouse events.
@@ -55,15 +57,18 @@ class BoardSetup():
                              GameLogic.update_turn(board)
                              GameLogic.determine_stalemate(board)
                              GameLogic.determine_checkmate(board)
+                             
                          else:
                              pass
+                             
                  else:
                      pass
+               
+           
             #Update the screen
             display.update_board_visuals(board)        
             # Make the most recently drawn screen visible.
             pygame.display.flip()
-            
           
 g = BoardSetup()
 g.run_board_setup()

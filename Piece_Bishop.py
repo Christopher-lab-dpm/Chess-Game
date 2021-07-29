@@ -17,10 +17,8 @@ class Bishop(Piece):
         of the legal moves a given piece has"""
                       
         legal_diag = self.check_diagonals(board)
-        
-        
-        legal_moves = self.check_allowed_moved(board,legal_diag)
-        
-        return legal_moves
+           
+        return legal_diag
             
-            
+   def check_allowed_moves(self,board, legal_moves):
+        return super().check_allowed_moved(board, legal_moves)         

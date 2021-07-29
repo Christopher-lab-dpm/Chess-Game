@@ -55,6 +55,8 @@ def move_piece(mouse_position, board):
          Note that this was of doing it loses certain information such as en passant 
          priveleges"""
          legal_moves = board.get_moving_piece().check_legal_moves(board)
+         allowed_moves = board.get_moving_piece().check_allowed_moves(board, legal_moves)
+         
          board_coord = PositionPlacement.mouse_to_board(mouse_position[0], mouse_position[1])
          
          if board_coord[1] < 0 or board_coord[1] > 7 or board_coord[0] < 0 or board_coord[0] > 7:
@@ -66,12 +68,12 @@ def move_piece(mouse_position, board):
            #Check if there is a piece at that location and opposite color or 
            #if it a possible move
            if  (selected_tile != 0 and (board.get_turn() == selected_tile.color 
-                or board_coord not in legal_moves)):
+                or board_coord not in allowed_moves)):
                print("That is an illegal move")
                board.change_moving_piece(None)
                return False #Move was not made
            
-           elif (selected_tile == 0 and board_coord not in legal_moves):
+           elif (selected_tile == 0 and board_coord not in allowed_moves):
                print("That is an illegal move")
                board.change_moving_piece(None)
                return False
@@ -89,17 +91,22 @@ def move_piece(mouse_position, board):
               
                 
 def determine_stalemate(board):
+    if board.White_in_check or board.Black_in_check:
+        return
     pieces_with_moves = 0
     for i in range(0,8):
         for j in range(0,8):
             current_piece = board.access_tile(i,j)
+            if current_piece != 0:
+              legal_moves = current_piece.check_legal_moves(board)
+              
             if (current_piece != 0
                and current_piece.get_color() == board.get_turn()
-               and current_piece.check_legal_moves(board) == [] ):
+               and current_piece.check_allowed_moves(board,legal_moves) == [] ):
                     pass
             elif (current_piece != 0
                and current_piece.get_color() == board.get_turn()
-               and current_piece.check_legal_moves(board) != []):
+               and current_piece.check_allowed_moves(board,legal_moves) != []):
                     pieces_with_moves += 1
             else: 
                 pass

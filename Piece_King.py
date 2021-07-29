@@ -11,7 +11,7 @@ class King(Piece):
        super(King, self).__init__(screen, color, name, board_coord)
        self.image_file = "Chess pieces"+"/"+name+".bmp"
        self.image = pygame.image.load(self.image_file)
-       self.moved = False
+       self.moved = True
        
    def has_moved(self):
        return self.moved
@@ -132,5 +132,8 @@ class King(Piece):
       all_legal_moves = legal_moves + casting_moves
       
       return all_legal_moves
-            
+  
+ 
+   def check_allowed_moves(self,board, legal_moves):
+       return super().check_allowed_moved(board, legal_moves)           
             

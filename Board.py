@@ -56,7 +56,14 @@ class Board():
                               "BlackKnight","BlackPawn","BlackRook",
                               "WhiteKing","WhiteQueen","WhiteBishop",
                               "WhiteKnight","WhitePawn","WhiteRook"]
-    
+        
+        
+        self.classical_dict = {'a':0,'b':1,"c":2,
+                              'd':3,'e':4,'f':5,
+                              'g':6,'h':7}
+       
+        self.reverse_classical_dict = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4:'e', 
+                                       5: 'f', 6: 'g', 7: 'h' }
     
     
     
@@ -92,10 +99,10 @@ class Board():
         elif (self.White_in_check and self.white_turn) or (self.Black_in_check 
              and self.black_turn):
             
-            self.undo_illegal_move(old_location, new_location,en_passant_capture,
-                                   pawn_promoted)
+            #self.undo_illegal_move(old_location, new_location,en_passant_capture,
+                                   #pawn_promoted)
             
-            print("Not a valid move \n")
+           # print("Not a valid move \n")
             return False
         
         elif self.White_in_check and not(self.Black_in_check) and self.black_turn:
@@ -106,7 +113,60 @@ class Board():
             self.reset_en_passant()
             return True
         
-                   
+    
+
+    def computer_change_piece_location(self,new_location):#New location (y,x) aka (i,j)
+        old_location =  self.moving_piece.get_position() # Of piece that just moved    
+        self.location_capture = None
+        en_passant_capture = False
+        pawn_promoted = False
+        
+        #Logic for allowing the capture of pieces 
+        en_passant_capture = self.allow_piece_capture(old_location, 
+                                                        new_location)
+        
+        #Check and setup en passant for other pawns if need be
+        self.set_up_en_passant(old_location, new_location)
+        
+        
+        pawn_promoted = self.computer_pawn_promotion(old_location, new_location)
+        
+        self.castle_king(old_location, new_location)
+        
+        #update the board and moving piece position/value    
+        self.board[old_location[0]][old_location[1]] = 0
+        self.board[new_location[0]] [new_location[1]] = self.moving_piece
+        self.moving_piece.update_position(new_location[0], new_location[1])
+        self.moving_piece = None
+        
+        self.check_king_safety()
+                
+        if self.Black_in_check and not(self.White_in_check) and self.white_turn:
+            self.reset_en_passant()
+            return True
+        elif (self.White_in_check and self.white_turn) or (self.Black_in_check 
+             and self.black_turn):
+            
+            #self.undo_illegal_move(old_location, new_location,en_passant_capture,
+                                   #pawn_promoted)
+            
+           # print("Not a valid move \n")
+            return False
+        
+        elif self.White_in_check and not(self.Black_in_check) and self.black_turn:
+            self.reset_en_passant()
+            return True
+
+        else:
+            self.reset_en_passant()
+            return True
+
+
+
+
+
+
+               
     def check_king_safety(self):
         y = self.black_king.board_coord[0]
         x = self.black_king.board_coord[1]
@@ -133,6 +193,7 @@ class Board():
         ##Set the moving values for rook and king if need be
         ##ONlY move the rook, logic for moving king is already done
         selected_piece = self.access_tile(*old_location)
+        
         position = selected_piece.get_position()
         kings = ["BlackKing", "WhiteKing"]
         rooks =  ["BlackRook", "WhiteRook"]
@@ -278,7 +339,36 @@ class Board():
                 return True
         else:
                 return False
-    
+            
+    def computer_pawn_promotion(self, old_location, new_location):
+        #Check if pawn needs to be promoted to: Queen, Knight, Bishop, Rook            
+        if ((self.moving_piece.name == "BlackPawn" and new_location[0] == 7) or 
+            (self.moving_piece.name =="WhitePawn" and new_location[0] == 0)):
+            
+                #promote the pawn
+                allowed_inputs = ['q','n','b','r']
+               
+                promote = "q"
+                
+                if self.moving_piece.color =="White":
+                    promote = (promote.strip()).capitalize()
+                else:
+                    promote = promote.strip()
+                    
+                
+                piece_name = self.name_dict[promote]
+                #Needs to have the extra 0 for padding because of the way the 
+                #function was written
+                position = self.get_moving_piece().get_position()
+                
+                self.create_piece_add_to_board(piece_name, 
+                                               position[0], position[1])
+                
+                self.change_moving_piece(self.access_tile(old_location[0],
+                                                          old_location[1]))
+                return True
+        else:
+                return False
     
     def undo_illegal_move(self, old_location, new_location,
                           en_passant_capture, pawn_promoted):
@@ -361,6 +451,16 @@ class Board():
     def access_row(self,y):
         return self.board[y]
          
+    def set_turn(self, color):
+        if color == 'w' or color == "White":
+             self.white_turn = True
+             self.black_turn = False
+        elif color == "b" or color == "Black":
+            self.white_turn = False
+            self.black_turn = True
+      
+        else:
+             pass
     
     def get_turn(self):
         if self.white_turn:
@@ -375,6 +475,8 @@ class Board():
     
     def get_black_king(self):
         return self.black_king  
+    
+   
     
     def get_white_turn(self):
          return self.white_turn
@@ -451,6 +553,7 @@ class Board():
         else:
             print("No piece could be made. This is not suppose to happen")
         
+        
         row[x] = populate_tile
         
         
@@ -466,7 +569,9 @@ class Board():
         List_of_symbols = ['k','q','b','n','p','r','K','Q','R','B','N','P']
         
         for char in FEN:
-           
+            if char == " ":
+                break
+            
             if char in List_of_symbols:
                 List_pieces_board_position.append((char,current_matrix_coord[0],
                                                      current_matrix_coord[1]))
@@ -480,19 +585,88 @@ class Board():
              
             else:
                 current_matrix_coord[1] += int(char)
+               
             
         return List_pieces_board_position
     
                 
     def intialize_board_position(self, FEN):
-         placement  = self.convert_FEN(FEN)
-         for place in placement:
-            current_piece_name = self.name_dict[place[0]]
-            piece_info = (current_piece_name, place[1], place[2])
-            self.create_piece_add_to_board(*piece_info)            
-    
+        placement  = self.convert_FEN(FEN)
+        for place in placement:
+           current_piece_name = self.name_dict[place[0]]
+           piece_info = (current_piece_name, place[1], place[2])
+           self.create_piece_add_to_board(*piece_info)  
+           
+        turn_index = FEN.index(" ") + 1
+        
+        self.set_turn(FEN[turn_index])
+        
+        index = turn_index + 2
+        
+        white_rook_squares = [self.access_tile(7,0) , self.access_tile(7,7)]
+        black_rook_squares = [self.access_tile(0,0) , self.access_tile(0,7)]
+           
+        while (index < len(FEN) and FEN[index] != " "):
+            char = FEN[index]
+            if char == "K": #Kingside castle for white
+                self.get_white_king().set_moved(False)
+                white_rook_squares[1].set_moved(False)
+            elif char == "Q": #queenside castle for white
+                  self.get_white_king().set_moved(False)
+                  white_rook_squares[0].set_moved(False)
+            elif char == "k": #Kingside castle for black
+                 self.get_black_king().set_moved(False)
+                 black_rook_squares[1].set_moved(False) 
+            elif char == "q": #queenside castle for black
+                self.get_black_king().set_moved(False)
+                black_rook_squares[0].set_moved(False) 
+           
+            index = index + 1
+         
+        ##Set up en passant    
+        index = index + 1 
+        if (index < len(FEN) and FEN[index] in self.classical_dict):
+            if self.get_turn() == "Black": #White jusrt moved and we are getting white pawn position
+                new_location  = ((( 8 - int(FEN[index + 1]))-1), self.classical_dict[FEN[index]])
+            else:
+                new_location  = ((( 8 - int(FEN[index + 1]))+1), self.classical_dict[FEN[index]])
+            
+            #See if en_passant is possible for White
+            if self.get_turn() == "White":#Black just moved two squares
+                #Check to left of black piece. Right of white piece
+               if (new_location[1] > 0 and
+                 self.board[new_location[0]] [new_location[1]-1] !=0  and 
+                  self.board[new_location[0]] [new_location[1]-1].name == "WhitePawn"):  
+                      self.board[new_location[0]] [new_location[1]-1].set_en_passant_right(True)
+               
+               #Check to right of black piece. left of white piece 
+               if (new_location[1] < 7 and 
+                   self.board[new_location[0]] [new_location[1]+1] !=0  and 
+                  self.board[new_location[0]] [new_location[1]+1].name == "WhitePawn"):
+                   self.board[new_location[0]] [new_location[1]+1].set_en_passant_left(True)
+            
+            #Check en passant for black         
+            elif  self.get_turn() == "Black": #White just moved two squares
+                #Check to left of white piece. Right of black piece
+               if (new_location[1] > 0 and
+                   self.board[new_location[0]] [new_location[1]-1] !=0  and 
+                  self.board[new_location[0]] [new_location[1]-1].name == "BlackPawn"):  
+                      self.board[new_location[0]] [new_location[1]-1].set_en_passant_right(True)
+               
+               #Check to right of white piece. left of black piece 
+               if (new_location[1] < 7 and
+                   self.board[new_location[0]] [new_location[1]+1] !=0  and 
+                  self.board[new_location[0]] [new_location[1]+1].name == "BlackPawn"):
+                   self.board[new_location[0]] [new_location[1]+1].set_en_passant_left(True)
+            else:
+                 pass
     
     def create_new_FEN(self):
+        kings = ["BlackKing", "WhiteKing"]
+        rooks =  ["BlackRook", "WhiteRook"]
+        
+        castling = []
+        en_passant_square =[]
         space_count = 0
         new_FEN=""
         for i in range(0,8):
@@ -505,6 +679,40 @@ class Board():
                     else:
                         new_FEN += self.reverse_name_dict[current_tile.name]
                     space_count = 0
+                    
+                    
+                    #Logic for tracking castling right
+                    if (current_tile.name in rooks and 
+                       not(current_tile.has_moved())):
+                            if (current_tile.color == "White" and
+                                not(self.white_king.has_moved())):
+                                    if  current_tile.board_coord[1] == 7:
+                                        castling.append('K')
+                                    else:
+                                        castling.append('Q')
+                            elif (current_tile.color == "Black" and
+                                not(self.black_king.has_moved())):
+                                     if  current_tile.board_coord[1]  == 7:
+                                        castling.append('k')
+                                     else:
+                                        castling.append('q')
+                    
+                    if (current_tile.name == "WhitePawn" or 
+                        current_tile.name == "BlackPawn"):
+                        y  = current_tile.board_coord[0]
+                        x = current_tile.board_coord[1]
+                        
+                        if current_tile.en_passantL and current_tile.color == "White":
+                           en_passant_square.append(( y - 1 , x-1))
+                        elif current_tile.en_passantR and current_tile.color == "White":  
+                          en_passant_square.append( ( y -1, x +1))
+                        elif current_tile.en_passantL and current_tile.color == "Black":
+                            en_passant_square.append((y + 1 , x-1))
+                        elif current_tile.en_passantR and current_tile.color == "Black":
+                            en_passant_square.append((y +1 , x +1))
+                     
+                            
+                
                 else:
                     space_count += 1
                     
@@ -517,10 +725,32 @@ class Board():
                 elif j ==7 and i == 7:
                     if space_count != 0:
                          new_FEN += str(space_count)
-        print("\n" + "New FEN is: ")
-        print(new_FEN)                 
+                         
+        new_FEN += " "  
+        if self.get_turn() == "White":
+            new_FEN += "w"
+        else:
+            new_FEN += "b"
+        new_FEN += " "       
+        for char in castling:
+            new_FEN += char
+        new_FEN += " "
+        for en_passant in en_passant_square:
+             
+             new_FEN  = (new_FEN + 
+                         str(self.reverse_classical_dict.get(en_passant[1])) +
+                         str( (8 - en_passant[0])))
+        new_FEN  = new_FEN.strip()          
+       # print("\n" + "New FEN is: ")
+        #print(new_FEN)                 
         return new_FEN
         
+    def reset_board_position(self, FEN):
+         for i in range(0,8):
+            for j in range(0,8):
+                self.set_tile(i, j, 0)
+         self.intialize_board_position(FEN)   
+         
     
     def reset_board(self):
         for i in range(0,8):
