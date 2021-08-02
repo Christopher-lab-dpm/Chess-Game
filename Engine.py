@@ -5,24 +5,12 @@ Created on Wed Jul 28 14:47:38 2021
 @author: Christopher
 """
 
-import sys
-import pygame
-
-from BoardSettings import BoardSetting
-
-from Display  import Display
-from Board import Board
-import GameLogic
-
-
 class Engine():
-    def __init__(self, FEN, color, depth):
+    def __init__(self, color, depth):
         
         self.max_Positions = 0
         self.depth = depth
         self.color = color
-        
-        self.original_FEN = FEN
         
         self.piece_value = {"BlackKing": -100,"BlackQueen":-10,"BlackBishop":-3,
                                "BlackKnight":-3,"BlackPawn":-1,"BlackRook":-5,
@@ -83,12 +71,12 @@ class Engine():
         return sorted_pieces                
            
 
-    def mini_max(self, board, depth, player,FEN, alpha = -10000 , beta = 10000, max_Positions=1000): #Depth is number of half move(rg. 6 mean black does 3 and white does 3)
+    def mini_max(self, board, depth, player, alpha = -10000 , beta = 10000, max_Positions= 100000): #Depth is number of half move(rg. 6 mean black does 3 and white does 3)
         self.max_Positions += 1
-      
         opp_color = None
         move_eval = []
-        best_eval = 0 
+        best_eval = (0,0,0)
+        
         if depth == 0 : 
            return self.evaluation(board)
        
@@ -104,36 +92,22 @@ class Engine():
             original_position = piece.get_position()
             for move in all_moves[piece]:
               board.change_moving_piece(board.access_tile(*original_position))
-              board.computer_change_piece_location(move)
-              new_FEN = board.create_new_FEN()
-              
-              
-              if self.max_Positions == max_Positions and depth == self.depth:
-                  x= 0
-                  if player == "Black":
-                      x = 10000
-                  else:
-                      x = -10000
-                  best_eval =  (piece, move, x  ) 
-                  return best_eval
-              elif self.max_Positions == max_Positions and depth != self.depth:
-                  x= 0
-                  if player == "Black":
-                      x = 10000
-                  else:
-                      x = -10000
-                  return x
+              undo_info = board.computer_change_piece_location(move)
+   
+              if self.max_Positions >= max_Positions:
+                  board.undo_illegal_move(undo_info[0],undo_info[1],undo_info[2],
+                                      undo_info[3], undo_info[4])    
+                  break
               else:
                   pass 
               
-              
-              
-              move_eval.append( (piece, move , self.mini_max(board, (depth-1), opp_color, new_FEN))) 
+              move_eval.append( (piece, move , self.mini_max(board, (depth-1), opp_color))) 
              
               if len(move_eval) == 1 : 
                   best_eval = move_eval[0]
               elif len(move_eval) == 0:
                   pass
+                  
               else:
                  if move_eval[len(move_eval) -1][2] < best_eval[2] and player == "Black":
                      best_eval = move_eval[len(move_eval) -1]
@@ -144,16 +118,11 @@ class Engine():
                  else:
                      pass
     
-              board.reset_board_position(FEN)
-              piece.update_position(*original_position)
+              board.undo_illegal_move(undo_info[0],undo_info[1],undo_info[2],
+                                      undo_info[3], undo_info[4])
               
-              if self.max_Positions == max_Positions and depth == self.depth:
-                  return best_eval
-              elif self.max_Positions == max_Positions and depth != self.depth:
-                   return best_eval[2]
-              else:
-                  pass 
-                 
+              piece.update_position(*original_position)
+                               
               if beta <= alpha and depth == self.depth:
                   return best_eval
               elif beta <= alpha and depth != self.depth:
@@ -164,11 +133,12 @@ class Engine():
         if depth == self.depth:
             return best_eval   
          
-        return best_eval[2]
+        else:
+            return best_eval[2]
             
     def make_move(self, board):
-        FEN =  board.create_new_FEN()
-        best_move = self.mini_max(board, self.depth, self.color, FEN)
+        
+        best_move = self.mini_max(board, self.depth, self.color)
         #print(best_move)
         #print(best_move[0].get_position())
         board.change_moving_piece(board.access_tile(*best_move[0].get_position())) 
@@ -181,10 +151,9 @@ class Engine():
 """
 BoardSettings = BoardSetting()        
 screen = pygame.display.set_mode((BoardSettings.screen_width,BoardSettings.screen_height))      
-
-FEN = "rnbqkb1r/ppp1pppp/5n2/3P4/8/8/PPPPQPPP/RNB1KBNR b qkQK"                                                    
+FEN = "rnbqkb1r/ppp1pppp/5n2/3P4/8/8/PPPPQPPP/RNB1KBNR b qkQK"                                                  
 board = Board(screen)
-engine = Engine(FEN, "Black",1)
+engine = Engine("Black",1)
 
 board.intialize_board_position(FEN)  
 

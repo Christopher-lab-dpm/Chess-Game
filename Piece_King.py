@@ -31,7 +31,7 @@ class King(Piece):
        in_betweenL = None
        coord_L = None
        
-       if board.get_turn() == "White":
+       if self.color == "White":
            king_square = board.access_tile(7,4)
            rook_squares = [board.access_tile(7,0) , board.access_tile(7,7)]
            in_betweenL = [board.access_tile(7,3), board.access_tile(7,2),
@@ -39,7 +39,7 @@ class King(Piece):
            coord_L = [(7,3),(7,2)]
            in_betweenR = [board.access_tile(7,5), board.access_tile(7,6)]
            coord_R = [(7,5),(7,6)] 
-       elif board.get_turn() == "Black":
+       elif self.get_color() == "Black":
            king_square = board.access_tile(0,4)
            rook_squares = [board.access_tile(0,0) , board.access_tile(0,7)]
            in_betweenL = [board.access_tile(0,3), board.access_tile(0,2),
@@ -52,14 +52,13 @@ class King(Piece):
            
        if ( king_square != 0
             and (board.White_in_check or board.Black_in_check) == False
-            and king_square.name in kings 
-            and king_square.get_color() == board.get_turn()
+            and king_square.name in kings
             and king_square.has_moved() == False):
            
             for rook_square in rook_squares:
                 if ( rook_square != 0
                 and rook_square.name in rooks
-                and rook_square.get_color() == board.get_turn()
+                and rook_square.get_color() == king_square.get_color()
                 and rook_square.has_moved() == False):
                     #Check left first
                   if rook_square.get_position()[1] == 0:  
@@ -68,9 +67,9 @@ class King(Piece):
                            in_betweenL[2] == 0):
                             
                             threat1 = Piece_Safety.check_piece_safety(
-                                *coord_L[0], board.get_turn() , board)
+                                *coord_L[0], king_square.get_color() , board)
                             threat2  = Piece_Safety.check_piece_safety(
-                                *coord_L[1], board.get_turn(), board)
+                                *coord_L[1], king_square.get_color(), board)
                             if (len(threat1) == 0 and len(threat2) == 0):
                                 castling_moves.append(coord_L[1])
                             
@@ -80,9 +79,9 @@ class King(Piece):
                            in_betweenR[1] == 0):
                             
                             threat1 = Piece_Safety.check_piece_safety(
-                                *coord_R[0], board.get_turn(), board)
+                                *coord_R[0], king_square.get_color(), board)
                             threat2  = Piece_Safety.check_piece_safety(
-                                *coord_R[1], board.get_turn(), board)
+                                *coord_R[1], king_square.get_color(), board)
                             if (len(threat1) == 0 and len(threat2) == 0):
                                 castling_moves.append(coord_R[1])        
                 else:

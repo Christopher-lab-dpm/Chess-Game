@@ -72,9 +72,10 @@ class Board():
         self.location_capture = None
         en_passant_capture = False
         pawn_promoted = False
+        color = self.moving_piece.color
         
         #Logic for allowing the capture of pieces 
-        en_passant_capture = self.allow_piece_capture(old_location, 
+        capture_type = self.allow_piece_capture(old_location, 
                                                         new_location)
         
         #Check and setup en passant for other pawns if need be
@@ -94,7 +95,7 @@ class Board():
         self.check_king_safety()
                 
         if self.Black_in_check and not(self.White_in_check) and self.white_turn:
-            self.reset_en_passant()
+            self.reset_en_passant(color)
             return True
         elif (self.White_in_check and self.white_turn) or (self.Black_in_check 
              and self.black_turn):
@@ -106,11 +107,11 @@ class Board():
             return False
         
         elif self.White_in_check and not(self.Black_in_check) and self.black_turn:
-            self.reset_en_passant()
+            self.reset_en_passant(color)
             return True
 
         else:
-            self.reset_en_passant()
+            self.reset_en_passant(color)
             return True
         
     
@@ -120,9 +121,10 @@ class Board():
         self.location_capture = None
         en_passant_capture = False
         pawn_promoted = False
+        color = self.moving_piece.color
         
         #Logic for allowing the capture of pieces 
-        en_passant_capture = self.allow_piece_capture(old_location, 
+        capture_type = self.allow_piece_capture(old_location, 
                                                         new_location)
         
         #Check and setup en passant for other pawns if need be
@@ -139,27 +141,9 @@ class Board():
         self.moving_piece.update_position(new_location[0], new_location[1])
         self.moving_piece = None
         
-        self.check_king_safety()
-                
-        if self.Black_in_check and not(self.White_in_check) and self.white_turn:
-            self.reset_en_passant()
-            return True
-        elif (self.White_in_check and self.white_turn) or (self.Black_in_check 
-             and self.black_turn):
-            
-            #self.undo_illegal_move(old_location, new_location,en_passant_capture,
-                                   #pawn_promoted)
-            
-           # print("Not a valid move \n")
-            return False
+        self.reset_en_passant(color)
         
-        elif self.White_in_check and not(self.Black_in_check) and self.black_turn:
-            self.reset_en_passant()
-            return True
-
-        else:
-            self.reset_en_passant()
-            return True
+        return (old_location, new_location, capture_type[0], capture_type[1], pawn_promoted)
 
 
 
@@ -271,13 +255,13 @@ class Board():
                 else:
                      pass
     
-    def reset_en_passant(self):
+    def reset_en_passant(self,color):
         pawn = ["BlackPawn", "WhitePawn" ] 
         for i in range(0,8):
             for j in range(0,8):
                 if (self.access_tile(i,j) != 0 and 
                    self.access_tile(i,j).name in pawn and 
-                   self.access_tile(i, j).color == self.get_turn()):
+                   self.access_tile(i, j).color == color):
                        self.access_tile(i, j).set_en_passant_right(False)
                        self.access_tile(i, j).set_en_passant_left(False)
      
@@ -288,23 +272,25 @@ class Board():
                 self.location_capture = self.access_tile(*new_location)
                 #Remove the piece
                 self.board[new_location[0]] [new_location[1]] = 0 #remove the piece
-                return False
+                return (self.location_capture, False)
             
         #The following is the logic which enables en passant capture to occur        
         elif (self.access_tile(*new_location) == 0 and
         (self.moving_piece.name =="BlackPawn" or self.moving_piece.name == "WhitePawn")
-        and (old_location[0] != new_location[0] and old_location[1] != new_location[1])):
+        and (old_location[0] != new_location[0] and old_location[1] != new_location[1])
+        and self.access_tile(old_location[0], new_location[1])!=0):
+        
             #En passant capture has just occured.
                     #remove the piece
-                    print("EN PASSANT")
+                    
                     self.location_capture = self.access_tile(old_location[0], 
                                                             new_location[1])
-                    
-                    self.board[old_location[0]] [new_location[1]] = 0
                    
-                    return True
+                    self.board[old_location[0]] [new_location[1]] = 0
+                    
+                    return (self.location_capture, True)
         else:
-            return False
+            return (None, False)
     
     def pawn_promotion(self, old_location, new_location):
         #Check if pawn needs to be promoted to: Queen, Knight, Bishop, Rook            
@@ -370,12 +356,12 @@ class Board():
         else:
                 return False
     
-    def undo_illegal_move(self, old_location, new_location,
+    def undo_illegal_move(self, old_location, new_location,captured_piece,
                           en_passant_capture, pawn_promoted):
                                                     
             #Undo the move
         
-            if(self.location_capture == None and
+            if(captured_piece == None and
                en_passant_capture == False
                and pawn_promoted == False):#Reset as normal
                                          
@@ -384,25 +370,27 @@ class Board():
                 self.access_tile(*old_location).update_position(*old_location)
                 self.set_tile(*new_location, 0)
                 
-            elif (self.location_capture != None and en_passant_capture == False
+            elif (captured_piece != None and en_passant_capture == False
                 and pawn_promoted == False):
                
                 #it was a normal capture
                 self.set_tile(old_location[0], old_location[1], 
                               self.access_tile(*new_location))
                 self.access_tile(*old_location).update_position(*old_location)
-                self.set_tile(*new_location, self.location_capture)
+                self.set_tile(*new_location, captured_piece)
                 self.access_tile(*new_location).update_position(*new_location)
                 
-            elif (self.location_capture != None and en_passant_capture == True
-                and pawn_promoted == False):    
+            elif (captured_piece != None and en_passant_capture == True
+                and pawn_promoted == False): 
+                
                 #You captured en passant
                 self.set_tile(old_location[0], old_location[1], 
                               self.access_tile(*new_location))
                 self.access_tile(*old_location).update_position(*old_location)
                 self.set_tile(*new_location, 0)
                 
-                self.set_tile(old_location[0],new_location[1], self.location_capture)
+                self.set_tile(old_location[0],new_location[1], captured_piece)
+                
                 self.access_tile(old_location[0],new_location[1]).update_position(
                     old_location[0],new_location[1])
             
@@ -417,17 +405,16 @@ class Board():
                 self.create_piece_add_to_board(pawntype,old_location[0], 
                                                old_location[1])
                 self.access_tile(*old_location).update_position(*old_location)
-                if self.location_capture == None:
+                if captured_piece == None:
                     pass
                 else:#A piece was captured and must be put back
-                    self.set_tile(*new_location,self.location_capture)
+                    self.set_tile(*new_location,captured_piece)
                     self.access_tile(*new_location).update_position(*new_location)
-                    
+                   
             else:
                 pass
                 
-    
-    
+       
     def is_moving_piece(self):
         """Returns a boolean letting us know is a piece is trying to move"""
         if self.moving_piece != None:

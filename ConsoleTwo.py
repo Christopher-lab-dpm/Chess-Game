@@ -14,11 +14,15 @@ class BoardSetup():
     
     def __init__(self):
         
-        self.FEN = "rnbqkb1r/ppp1pppp/5n2/3P4/8/8/PPPPQPPP/RNB1KBNR b qkQK"
+        self.FEN = "rnbqkb1r/ppp1pppp/5n2/3P4/8/8/PPPPQPPP/RNB1KBNR w qkQK"
+        #self.FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w qkQK"
+        
+       
         self.setting = BoardSetting()
+        
         self.screen = pygame.display.set_mode((self.setting.screen_width,
                                                self.setting.screen_height))
-        self.comp_engine =  Engine(self.FEN, "Black", 6)  
+        self.comp_engine =  Engine("Black", 4)  
    
     
     def run_board_setup(self):

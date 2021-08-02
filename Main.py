@@ -25,9 +25,9 @@ class BoardSetup():
          # Give title to opned window
          pygame.display.set_caption("Chess Board")
          
-         #FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq"
+        # FEN = "4k3/P7/8/8/8/8/8/R3K3 w "
          #FEN = "rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR b qkQK"  
-         FEN = "rnbqkb1r/ppp1pppp/5n2/3P4/8/8/PPPPQPPP/RNB1KBNR b qkQK"
+         FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w qkQK"
          # Add a piece 
          display  = Display(self.screen)
          # Create board instance
